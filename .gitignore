@@ -1,0 +1,31 @@
+# Ignora ambientes virtuais Python
+Hand-Tracking/Include/
+Hand-Tracking/Lib/
+Hand-Tracking/Scripts/
+Hand-Tracking/share/
+Hand-Tracking/pyvenv.cfg
+
+# Ignora arquivos de cache do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Ignora logs e arquivos temporários
+*.log
+*.tmp
+*.swp
+
+# Ignora arquivos de banco de dados
+*.db
+*.sqlite3
+
+# Ignora arquivos de pacotes
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Ignora diretórios criados por IDEs
+.vscode/
+.idea/
