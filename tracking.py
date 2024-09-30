@@ -31,6 +31,9 @@ while True:
     # Se houver mãos detectadas, desenha as marcações e conexões na imagem
     if resultado.multi_hand_landmarks:
         for hand_marking in resultado.multi_hand_landmarks:
+            for marking in hand_marking.landmark:
+                coord_X, coord_y, coord_z=int(marking.x*resolution_x), int(marking.y*resolution_y), int(marking.z*resolution_x)
+                print(coord_X, coord_y, coord_z)
             # Desenha os pontos e as conexões das mãos detectadas
             mp_desenho.draw_landmarks(imagem, hand_marking, mp_hand.HAND_CONNECTIONS)
 
