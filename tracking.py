@@ -17,7 +17,7 @@ resolution_y = 720
 webcam.set(cv2.CAP_PROP_FRAME_WIDTH, resolution_x)
 webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_y)
 
-def encontra_coord(imagem):
+def encontra_coord(imagem, reverse_side=False):
     # Converte a imagem de BGR (formato padrão do OpenCV) para RGB (formato necessário para MediaPipe)
     imagem_rgb = cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB)
 
@@ -28,7 +28,7 @@ def encontra_coord(imagem):
     # Verifica se há mãos detectadas
     if resultado.multi_hand_landmarks:
         # Itera sobre todas as mãos detectadas
-        for hand_marking in resultado.multi_hand_landmarks:
+        for hand_side, hand_marking in zip(resultado.multi_handedness, resultado.multi_hand_landmarks):
             info_hand={}  # Dicionário para armazenar as coordenadas da mão atual
             coord=[]  # Lista para armazenar as coordenadas dos pontos da mão
 
@@ -39,6 +39,14 @@ def encontra_coord(imagem):
                 coord.append((coord_X, coord_y, coord_z))  # Armazena as coordenadas
 
             info_hand["coord"] = coord  # Armazena as coordenadas no dicionário
+            if reverse_side:
+                if hand_side.classification[0].label=="Left":
+                    info_hand["Lado"]="Right"
+                else:
+                    info_hand["Lado"]="Left"
+            else:
+                info_hand["Lado"]=hand_side.classification[0].label
+            print(info_hand["Lado"])
             whole_hands.append(info_hand)  # Adiciona a mão à lista de mãos
 
             # Desenha os pontos e as conexões das mãos detectadas
@@ -51,6 +59,8 @@ def encontra_coord(imagem):
 while True:
     # Captura um frame da webcam
     sucesso, imagem = webcam.read()
+    
+    imagem=cv2.flip(imagem, 1)
     
     # Se a captura falhar, pula para a próxima iteração
     if not sucesso:
