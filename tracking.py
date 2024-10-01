@@ -17,27 +17,49 @@ resolution_y = 720
 webcam.set(cv2.CAP_PROP_FRAME_WIDTH, resolution_x)
 webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_y)
 
-# Loop principal para capturar e processar o vídeo em tempo real
-while True:
-    # Captura um frame da webcam
-    sucesso, imagem = webcam.read()
-
+def encontra_coord(imagem):
     # Converte a imagem de BGR (formato padrão do OpenCV) para RGB (formato necessário para MediaPipe)
     imagem_rgb = cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB)
 
     # Processa a imagem para detectar mãos e suas marcações
     resultado = hand.process(imagem_rgb)
+    whole_hands=[]
 
-    # Se houver mãos detectadas, desenha as marcações e conexões na imagem
+    # Verifica se há mãos detectadas
     if resultado.multi_hand_landmarks:
+        # Itera sobre todas as mãos detectadas
         for hand_marking in resultado.multi_hand_landmarks:
+            info_hand={}  # Dicionário para armazenar as coordenadas da mão atual
+            coord=[]  # Lista para armazenar as coordenadas dos pontos da mão
+
+            # Itera sobre os landmarks (pontos) da mão
             for marking in hand_marking.landmark:
-                coord_X, coord_y, coord_z=int(marking.x*resolution_x), int(marking.y*resolution_y), int(marking.z*resolution_x)
-                print(coord_X, coord_y, coord_z)
+                # Calcula as coordenadas X, Y, Z escaladas de acordo com a resolução
+                coord_X, coord_y, coord_z = int(marking.x * resolution_x), int(marking.y * resolution_y), int(marking.z * resolution_x)
+                coord.append((coord_X, coord_y, coord_z))  # Armazena as coordenadas
+
+            info_hand["coord"] = coord  # Armazena as coordenadas no dicionário
+            whole_hands.append(info_hand)  # Adiciona a mão à lista de mãos
+
             # Desenha os pontos e as conexões das mãos detectadas
             mp_desenho.draw_landmarks(imagem, hand_marking, mp_hand.HAND_CONNECTIONS)
 
-    # Exibe o frame processado com as marcações de mãos na janela "Câmera"
+    # Retorna a imagem com os desenhos e as coordenadas das mãos
+    return imagem, whole_hands
+
+# Loop principal para capturar e processar o vídeo em tempo real
+while True:
+    # Captura um frame da webcam
+    sucesso, imagem = webcam.read()
+    
+    # Se a captura falhar, pula para a próxima iteração
+    if not sucesso:
+        break
+    
+    # Chama a função para encontrar as coordenadas das mãos e processa a imagem
+    imagem, whole_hands = encontra_coord(imagem)
+
+    # Exibe o frame processado com as marcações de mãos na janela
     cv2.imshow("Câmera", imagem)
 
     # Aguarda 1 ms por uma tecla pressionada, se a tecla 'Esc' (código 27) for pressionada, sai do loop
