@@ -2,6 +2,13 @@ import cv2
 import mediapipe as mp
 import os
 
+BRANCO = (255, 255, 255)
+PRETO = (0, 0, 0)
+AZUL = (255, 0, 0)
+VERDE = (0, 255, 0)
+VERMELHO = (0, 0, 255)
+AZUL_CLARO = (255, 255, 0)
+
 mp_hand = mp.solutions.hands
 mp_desenho = mp.solutions.drawing_utils
 
@@ -65,11 +72,12 @@ while True:
     imagem = cv2.flip(imagem, 1)
     imagem, whole_hands = encontra_coord(imagem)
     
-    
+    cv2.rectangle(imagem, (50, 50), (100, 100), BRANCO, cv2.FILLED)
+    cv2.putText(imagem, "Q", (65, 85), cv2.FONT_HERSHEY_COMPLEX, 1, PRETO, 2)
 
     if len(whole_hands) == 1:
         info_fingers1 = raised_fingers(whole_hands[0])
-        if whole_hands[0]["Lado"]=="Right":
+        if whole_hands[0]["Lado"] == "Right":
             if info_fingers1 == [True, False, False, False] and not notepad:
                 notepad = True
                 os.startfile(r"C:\Windows\System32\notepad.exe")
@@ -79,10 +87,10 @@ while True:
             if info_fingers1 == [True, True, True, False] and not calculator:
                 calculator = True
                 os.startfile(r"C:\Windows\System32\calc.exe")
-            if info_fingers1==[False, False, False, False] and notepad==True:
-                notepad=False
+            if info_fingers1 == [False, False, False, False] and notepad:
+                notepad = False
                 os.system("TASKKILL /IM notepad.exe")
-            if info_fingers1==[True, False, False, True]:
+            if info_fingers1 == [True, False, False, True]:
                 break
     
     cv2.imshow("Câmera", imagem)
