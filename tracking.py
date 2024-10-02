@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import os
 
 # Inicializa os módulos de detecção de mãos e utilitários de desenho do MediaPipe
 mp_hand = mp.solutions.hands
@@ -16,6 +17,10 @@ resolution_x = 1280
 resolution_y = 720
 webcam.set(cv2.CAP_PROP_FRAME_WIDTH, resolution_x)
 webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_y)
+
+notepad = False
+chrome=False
+calculator=False
 
 def encontra_coord(imagem, reverse_side=False):
     # Converte a imagem de BGR (formato padrão do OpenCV) para RGB (formato necessário para MediaPipe)
@@ -86,6 +91,16 @@ while True:
     # Se houver uma mão detectada, verifica os dedos levantados
     if len(whole_hands) == 1:
         info_fingers1 = raised_fingers(whole_hands[0])
+        # Verifica se apenas o indicador está levantado
+        if info_fingers1 == [True, False, False, False] and not notepad:
+            notepad = True
+            os.startfile(r"C:\Windows\System32\notepad.exe")
+        if info_fingers1 == [True, True, False, False] and not chrome:
+            chrome = True
+            os.startfile(r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk")
+        if info_fingers1 == [True, True, True, False] and not calculator:
+            calculator = True
+            os.startfile(r"C:\Windows\System32\calc.exe")
     
     # Exibe o frame processado com as marcações de mãos na janela "Câmera"
     cv2.imshow("Câmera", imagem)
